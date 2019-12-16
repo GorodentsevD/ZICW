@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"math/big"
+	rand2 "math/rand"
+	"os"
 )
 
 type Server struct {
@@ -15,8 +17,69 @@ type Server struct {
 	Colors []int
 }
 
+func (server *Server) GenerateGraph(num int) {
+	var array [][]Node
+	for i := 0; i < num; i++ {
+		node := []Node{Node{
+			Edge:       i,
+			Color:      generateColor(),
+			R:          nil,
+			PrivateKey: nil,
+			PublicKey:  nil,
+		}, Node{
+			Edge:       i,
+			Color:      generateColor(),
+			R:          nil,
+			PrivateKey: nil,
+			PublicKey:  nil,
+		}}
+
+		array = append(array, node)
+	}
+	toJson := func(any interface{}) []byte {
+		bytes, _ := json.Marshal(any)
+		return bytes
+	}
+	_ = ioutil.WriteFile("graph.json", toJson(array), os.ModePerm)
+}
+
+func CreatedGraph() {
+	graph := [][]Node{
+		{Node{
+			Edge:       0,
+			Color:      0,
+			R:          nil,
+			PrivateKey: nil,
+			PublicKey:  nil,
+		},
+			Node{
+				Edge:       0,
+				Color:      2,
+				R:          nil,
+				PrivateKey: nil,
+				PublicKey:  nil,
+			}},
+	}
+	toJson := func(any interface{}) []byte {
+		bytes, _ := json.Marshal(any)
+		return bytes
+	}
+	_ = ioutil.WriteFile("graph.json", toJson(graph), os.ModePerm)
+}
+
+func generateColor() int {
+	r := rand2.Int63n(4)
+	if r == 1 {
+		return 0
+	} else if r == 2 {
+		return 1
+	} else {
+		return 2
+	}
+}
+
 func (server *Server) Initialize() *Server {
-	gr, _ := ioutil.ReadFile("Graph.json")
+	gr, _ := ioutil.ReadFile("graph.json")
 	graphFromJson := func(any []byte) [][]Node {
 		var graph [][]Node
 		if err := json.Unmarshal(any, &graph); err != nil {
